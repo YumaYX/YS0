@@ -24,6 +24,6 @@ RuboCop::RakeTask.new(:rubocop) do |t|
 end
 
 require 'rake/clean'
-CLOBBER.include('testdata/*.json', 'input', '.yardoc', '_site')
+CLOBBER.include('testdata/*/*.json', 'input', '.yardoc', '_site')
 
 task default: %i[test clobber yard]

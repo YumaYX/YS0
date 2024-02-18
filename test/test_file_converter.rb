@@ -14,11 +14,11 @@ class TestFileConverter < Minitest::Test
   def teardown; end
 
   def test_csv_to_hash
-    assert_equal(@expect, YS0.csv_to_hash('testdata/csv_to_json.csv'))
+    assert_equal(@expect, YS0.csv_to_hash('testdata/csv_to_json/csv_to_json.csv'))
   end
 
   def test_csv_to_json
-    dir = 'testdata/*.csv'
+    dir = 'testdata/csv_to_json/*.csv'
     Dir.glob(dir).map do |csv_file|
       YS0.csv_to_json(csv_file)
       json_file = csv_file.gsub(/.csv$/, '.json')

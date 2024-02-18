@@ -1,14 +1,13 @@
 default:
 	mkdir -p input
 	make convert
-	ls -1 input/*.json
 
 prep: default
 	ls -d /samba/share
 	cp -prv /samba/share/*.csv input
 
 test: default
-	cp -p testdata/*.csv input
+	cp -p testdata/csv_to_json/*.csv input
 	make convert
 
 convert:
