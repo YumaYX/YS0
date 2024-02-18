@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative './../lib/YS0'
+require_relative './../lib/ys0'
 
 target_glob = 'input/*.csv'
 File.dirname(target_glob)
