@@ -1,23 +1,27 @@
+TARGETDIR := input
+SAMBADIR  := /samba/share
+
 default:
 	@cat Makefile
 
 exec:
-	mkdir -p input
+	mkdir -p $(TARGETDIR)
 	make convert
 
 prep: exec
-	ls -d /samba/share
-	cp -prv /samba/share/*.csv input
+	ls -d $(SAMBADIR)
+	cp -v $(SAMBADIR)/*.csv $(TARGETDIR)
 
 test: exec
-	cp -p testdata/csv_to_json/*.csv input
+	cp -p testdata/csv_to_json/*.csv $(TARGETDIR)
 	make convert
+	ruby bin/control_json.rb
 
 convert:
 	ruby bin/csv_to_json.rb
 
 reset:
-	rm -f input/*.json
+	rm -f $(TARGETDIR)/*.json
 
 clean:
-	rm -rf input
+	rm -rf $(TARGETDIR)
