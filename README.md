@@ -1,10 +1,12 @@
 # YS0
 
+This repository serves the purpose of converting CSV files to JSON format, accommodating files with or without a UTF-8 BOM (Byte Order Mark). The conversion process targets CSV files within the 'input' directory.
+
 ## Practical Use
 
 Makefile
 
-## Development
+## Development Use
 
 Rakefile
 
