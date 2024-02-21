@@ -13,8 +13,9 @@ prep: exec
 	cp -v $(SAMBADIR)/*.csv $(TARGETDIR)
 
 test: exec
-	cp -p testdata/csv_to_json/*.csv $(TARGETDIR)
+	cp -v testdata/csv_to_json/*.csv $(TARGETDIR)
 	make convert
+	test $$(cksum $(TARGETDIR)/data.json | awk '{print $$1}') = '1330009106'
 	ruby bin/control_json.rb
 
 convert:
