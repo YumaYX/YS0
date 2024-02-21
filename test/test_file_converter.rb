@@ -11,8 +11,6 @@ class TestFileConverter < Minitest::Test
     }
   end
 
-  def teardown; end
-
   def test_csv_to_hash
     assert_equal(@expect, YS0.csv_to_hash('testdata/csv_to_json/csv_to_json.csv'))
   end
