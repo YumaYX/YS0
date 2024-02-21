@@ -1,0 +1,8 @@
+.DS_Store
+.yardoc/
+Gemfile.lock
+_site/
+*.json
+
+input/
+output/
