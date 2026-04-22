@@ -61,7 +61,7 @@
   failed_when: false
 
 - name: Install Ruby
-  ansible.builtin.shell: /bin/bash -lc "CONFIGURE_OPTS='--disable-install-doc' rbenv install {{ ruby_version }} && rbenv global {{ ruby_version }}"
+  ansible.builtin.shell: /bin/bash -lc "CONFIGURE_OPTS='--disable-install-doc' rbenv install --skip-existing {{ ruby_version }} && rbenv global {{ ruby_version }}"
   become: true
   become_user: "{{ prime_user }}"
   when: ('ruby ' + ruby_version) not in command_result.stdout
