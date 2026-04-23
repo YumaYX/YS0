@@ -22,7 +22,7 @@ sh role.sh <role>
 
 # Vagrantfile
 
-Vagrantfile for Testing the init
+Vagrantfile for Testing the YS0
 
 # How to connect to a Samba Server
 
