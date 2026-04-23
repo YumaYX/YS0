@@ -1,4 +1,4 @@
-# init
+# YS0
 
 Ansible Recipe for Red Hat Enterprise Linux-based Distributions: Setting up a Work Environment with the Installation of Ruby, various servers, and additional tools.
 
@@ -7,11 +7,11 @@ Ansible Recipe for Red Hat Enterprise Linux-based Distributions: Setting up a Wo
 run the following command as root on Red Hat Enterprise Linux-based Distribution
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/YumaYX/init/main/init.sh | sudo sh
+curl -fsSL https://raw.githubusercontent.com/YumaYX/YS0/main/init.sh | sudo sh
 ```
 
 ```sh
-curl -L bit.ly/startinit | sh
+curl -L bit.ly/ys0 | sh
 ```
 
 ## How to Excecute a role

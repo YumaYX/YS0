@@ -6,7 +6,8 @@ test -f /etc/redhat-release || { echo "Red Hat–based system required. /etc/red
 dnf -y update
 dnf -y install git make tar
 
-rm -rf /tmp/init
-git clone https://github.com/YumaYX/init.git /tmp/init
-cd /tmp/init && time make all
+reponame="YS0"
+rm -rf /tmp/${reponame}
+git clone https://github.com/YumaYX/${reponame}.git /tmp/${reponame}
+cd /tmp/${reponame} && time make all
 
