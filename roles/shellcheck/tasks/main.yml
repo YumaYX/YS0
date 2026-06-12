@@ -1,0 +1,12 @@
+---
+# tasks file for roles/shellcheck
+- name: Install EPEL repository
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+
+- name: Install ShellCheck
+  ansible.builtin.dnf:
+    name: ShellCheck
+    state: present
+
