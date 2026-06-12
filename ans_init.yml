@@ -19,6 +19,7 @@
     - console
     - workspace
     - user
+    - shellcheck
     #- homebrew
     #- rust
     - rust-dnf
