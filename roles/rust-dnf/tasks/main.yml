@@ -1,6 +1,6 @@
 ---
 # tasks file for roles/rust
-- name: Install rust
+- name: Install Rust toolchain packages
   ansible.builtin.dnf:
     name: "{{ packages }}"
     state: present
@@ -8,3 +8,6 @@
     packages:
       - rust
       - cargo
+      - rustfmt
+      - clippy
+
