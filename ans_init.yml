@@ -23,8 +23,9 @@
     #- homebrew
     #- rust
     - rust-dnf
+    #- ruby-dnf
     - ruby
-    - ys1
+    #- ys1
     - httpd
     - samba
     #- code

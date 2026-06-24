@@ -1,0 +1,74 @@
+---
+# tasks file for roles/ruby
+- name: Install packages for Ruby build and native gems
+  ansible.builtin.dnf:
+    name:
+      - ruby
+      - ruby-devel
+
+      # Development Tools 相当
+      - gcc
+      - gcc-c++
+      - make
+      - patch
+      - diffutils
+
+      # Ruby build dependencies
+      - autoconf
+      - automake
+      - libtool
+      - bison
+      - rust
+      - cargo
+
+      - openssl-devel
+      - readline-devel
+      - zlib-devel
+      - libyaml-devel
+      - libffi-devel
+      - gdbm-devel
+      - ncurses-devel
+      - sqlite-devel
+      - xz-devel
+      - bzip2-devel
+      - libuuid-devel
+      - gmp-devel
+
+      # Common gem dependencies
+      - libxml2-devel
+      - libxslt-devel
+      - postgresql-devel
+      - mariadb-connector-c-devel
+      - ImageMagick-devel
+
+      # Build helpers
+      - pkgconf-pkg-config
+      - git
+      - curl
+      - wget
+      - tar
+    state: present
+
+- name: Update Gems system
+  ansible.builtin.command: bash -lc "gem update --system"
+  become: true
+  become_user: "{{ prime_user }}"
+  register: result
+  changed_when: result.rc != 0
+
+- name: Install necessary gems
+  community.general.gem:
+    name: "{{ item }}"
+    user_install: false
+  with_items:
+    - bundler
+    - minitest
+    - rake
+    - roo
+    - rubocop
+    - rails
+    - activerecord
+    - sqlite3
+  become: true
+  become_user: "{{ prime_user }}"
+
