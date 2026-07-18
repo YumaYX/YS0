@@ -68,3 +68,18 @@
     target: install
   become: true
   become_user: "{{ prime_user }}"
+
+
+- name: Git clone # noqa latest[git]
+  ansible.builtin.git:
+    repo: https://github.com/YumaYX/YS10.git
+    dest: /work/lib/YS10
+  become: true
+  become_user: "{{ prime_user }}"
+
+- name: Run 'install' target as root
+  community.general.make:
+    chdir: /work/lib/YS10
+    target: install
+  become: true
+
