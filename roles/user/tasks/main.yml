@@ -68,17 +68,3 @@
     target: install
   become: true
   become_user: "{{ prime_user }}"
-
-- name: Git clone # noqa latest[git]
-  ansible.builtin.git:
-    repo: https://github.com/YumaYX/bin.git
-    dest: /work/lib/bin
-  become: true
-  become_user: "{{ prime_user }}"
-
-- name: Run 'install' target as {{ prime_user }}
-  community.general.make:
-    chdir: /work/lib/bin
-    target: install
-  become: true
-
