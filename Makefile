@@ -34,6 +34,6 @@ vagrant: clean
 	vagrant destroy -f --no-tty
 
 clean:
-	sudo date
+	sudo -v
 	-vagrant destroy -f
 	sudo rm -rf .venv uv.lock .vagrant
