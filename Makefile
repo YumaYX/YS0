@@ -1,3 +1,4 @@
+export UV_PYTHON_INSTALL_DIR := /tmp/uv/python
 UV := ~/.local/bin/uv
 ENV_VARS := sudo -E LANG=C
 ANSIBLE_CMD := ansible-playbook -i localhost, -c local
@@ -34,6 +35,6 @@ vagrant: clean
 	vagrant destroy -f --no-tty
 
 clean:
-	sudo -v
+	@sudo -v
 	-vagrant destroy -f
 	sudo rm -rf .venv uv.lock .vagrant

@@ -6,6 +6,14 @@
     password: "$6$CVPjfYCY$jGK9N2lKbkY3YH6yLZj.nyuKGhUGk3CxAvSeHn8KsToaHHbJafQ2NA/zV90H7Ij9YWb8xoBBbXT2z35N4RAjO1"
     shell: /bin/bash
 
+- name: Create remote_tmp for {{ prime_user }}
+  ansible.builtin.file:
+    path: /home/{{ prime_user }}/.ansible/tmp
+    state: directory
+    owner: "{{ prime_user }}"
+    group: "{{ prime_user }}"
+    mode: "0700"
+
 - name: Sudo
   ansible.builtin.template:
     src: templates/sudo.j2
