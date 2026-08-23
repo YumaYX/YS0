@@ -1,9 +1,12 @@
 ---
 # tasks file for roles/zed
-- name: install zed
+- name: Check if zed is installed
+  ansible.builtin.stat:
+    path: "/home/{{ prime_user }}/.local/bin/zed"
+  register: zed_bin
+
+- name: Install zed
   ansible.builtin.command: bash -lc "curl -f https://zed.dev/install.sh | sh"
-  ignore_errors: true
   become: true
   become_user: "{{ prime_user }}"
-  changed_when: false
-  failed_when: false
+  when: not zed_bin.stat.exists

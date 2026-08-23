@@ -17,7 +17,7 @@
   ansible.builtin.user:
     name: linuxbrew
     shell: /bin/bash
-    create_home: yes
+    create_home: true
     home: /home/linuxbrew
     state: present
 
@@ -34,24 +34,24 @@
   become: true
 
 - name: Set /home/linuxbrew permissions
-  file:
+  ansible.builtin.file:
     path: /home/linuxbrew
     mode: '0757'
     state: directory
 
 - name: Recursively set permissions for .linuxbrew
-  file:
+  ansible.builtin.file:
     path: /home/linuxbrew/.linuxbrew
     mode: '0757'
-    recurse: yes
+    recurse: true
     state: directory
 
 - name: Ensure Linuxbrew eval is in .bashrc
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /home/linuxbrew/.bashrc
     block: |
       test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
-    create: yes
+    create: true
     marker: "# {mark} ANSIBLE LINUXBREW INIT"
   become_user: linuxbrew
   become: true

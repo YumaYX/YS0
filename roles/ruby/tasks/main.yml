@@ -1,9 +1,14 @@
 ---
 # tasks file for roles/ruby
+- name: Check if CRB repository is enabled
+  ansible.builtin.shell: dnf repolist --enabled | grep -qE '^crb\b'
+  register: crb_check
+  changed_when: false
+  failed_when: false
+
 - name: Ensure CRB repository is enabled
   ansible.builtin.command: bash -lc "dnf config-manager --set-enabled crb"
-  register: result
-  changed_when: result.rc != 0
+  when: crb_check.rc != 0
 
 - name: Install necessary packages for Ruby
   ansible.builtin.dnf:
@@ -53,11 +58,10 @@
 
 - name: Check Ruby installation
   ansible.builtin.command: bash -lc "ruby -v"
-  ignore_errors: true
   become: true
   become_user: "{{ prime_user }}"
   register: command_result
-  changed_when: command_result.rc != 0
+  changed_when: false
   failed_when: false
 
 - name: Install Ruby
@@ -65,15 +69,11 @@
   become: true
   become_user: "{{ prime_user }}"
   when: ('ruby ' + ruby_version) not in command_result.stdout
-  register: result
-  changed_when: result.rc != 0
 
 - name: Update Gems system
   ansible.builtin.command: bash -lc "gem update --system"
   become: true
   become_user: "{{ prime_user }}"
-  register: result
-  changed_when: result.rc != 0
 
 #- name: Install necessary gems
 #  community.general.gem:
@@ -93,7 +93,7 @@
 #  become_user: "{{ prime_user }}"
 
 - name: Install necessary gems (no idempotency)
-  command: "/home/{{ prime_user }}/.rbenv/shims/gem install {{ item }}"
+  ansible.builtin.command: "/home/{{ prime_user }}/.rbenv/shims/gem install {{ item }}"
   loop:
     - bundler
   become: true

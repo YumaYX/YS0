@@ -52,15 +52,15 @@
     - /home/{{ prime_user }}/.ssh/id_ed25519.pub
 
 - name: Read public key from remote
-  command: cat /home/{{ prime_user }}/.ssh/id_ed25519.pub
+  ansible.builtin.command: cat /home/{{ prime_user }}/.ssh/id_ed25519.pub
   register: pubkey
   changed_when: false
 
 - name: Add key only if not present
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /home/{{ prime_user }}/.ssh/authorized_keys
     line: "{{ pubkey.stdout | trim }}"
-    create: yes
+    create: true
     mode: '0600'
 
 - name: Git clone # noqa latest[git]

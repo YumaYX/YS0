@@ -53,8 +53,6 @@
   ansible.builtin.command: bash -lc "gem update --system"
   become: true
   become_user: "{{ prime_user }}"
-  register: result
-  changed_when: result.rc != 0
 
 - name: Install necessary gems
   community.general.gem:

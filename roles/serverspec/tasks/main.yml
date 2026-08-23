@@ -24,8 +24,7 @@
 
 - name: Run Serverspec tests
   ansible.builtin.shell: /bin/bash -lc "cd serverspec && /usr/local/bin/rake"
-  register: result
-  changed_when: result.rc != 0
+  changed_when: false
 
 - name: Unmount smb share
   ansible.posix.mount:

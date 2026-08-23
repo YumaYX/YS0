@@ -34,14 +34,6 @@
     remote_src: true
     backup: true
 
-- name: Ensure share directory exists
-  ansible.builtin.file:
-    path: /samba/share
-    state: directory
-    owner: "{{ prime_user }}"
-    group: "{{ prime_user }}"
-    mode: "0755"
-
 - name: Write custom smb.conf
   ansible.builtin.copy:
     dest: /etc/samba/smb.conf

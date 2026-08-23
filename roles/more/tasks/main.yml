@@ -10,7 +10,7 @@
     gpgkey: https://dl.google.com/linux/linux_signing_key.pub
 
 - name: Install Google Chrome
-  dnf:
+  ansible.builtin.dnf:
     name: google-chrome-stable
     state: present
 
