@@ -56,19 +56,33 @@
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Check Ruby installation
-  ansible.builtin.command: bash -lc "ruby -v"
+- name: Check installed Ruby versions
+  ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv versions --bare
   become: true
   become_user: "{{ prime_user }}"
-  register: command_result
+  register: rbenv_versions
   changed_when: false
   failed_when: false
 
 - name: Install Ruby
-  ansible.builtin.shell: /bin/bash -lc "CONFIGURE_OPTS='--disable-install-doc' rbenv install --skip-existing {{ ruby_version }} && rbenv global {{ ruby_version }}"
+  ansible.builtin.shell: /bin/bash -lc "CONFIGURE_OPTS='--disable-install-doc' /home/{{ prime_user }}/.rbenv/bin/rbenv install {{ ruby_version }}"
   become: true
   become_user: "{{ prime_user }}"
-  when: ('ruby ' + ruby_version) not in command_result.stdout
+  when: ruby_version not in rbenv_versions.stdout_lines
+
+- name: Check global Ruby version
+  ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv global
+  become: true
+  become_user: "{{ prime_user }}"
+  register: rbenv_global
+  changed_when: false
+  failed_when: false
+
+- name: Set global Ruby version
+  ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv global {{ ruby_version }}
+  become: true
+  become_user: "{{ prime_user }}"
+  when: rbenv_global.stdout | trim != ruby_version
 
 - name: Update Gems system
   ansible.builtin.command: bash -lc "gem update --system"
