@@ -6,7 +6,7 @@
     state: present
 
 - name: Enable and start firewalld
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: firewalld
     enabled: true
     state: started
@@ -66,9 +66,10 @@
     name: "{{ prime_user }}"
     state: present
 
-- name: Fetch users
+- name: Fetch Samba users
   ansible.builtin.command: /usr/bin/pdbedit -L
   register: pdb_users
+  changed_when: false
 
 - name: Set Samba password for {{ prime_user }}
   ansible.builtin.shell: (echo '{{ prime_user }}'; echo '{{ prime_user }}') | /usr/bin/smbpasswd -s -a "{{ prime_user}}"
@@ -97,17 +98,11 @@
 
 - name: Apply SELinux context to share directory
   ansible.builtin.command: restorecon -Rv /samba
-- name: Enable smb and nmb services
-  ansible.builtin.systemd:
+
+- name: Enable and restart smb and nmb services
+  ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
-  loop:
-    - smb
-    - nmb
-
-- name: Restart smb and nmb services
-  ansible.builtin.systemd:
-    name: "{{ item }}"
     state: restarted
   loop:
     - smb

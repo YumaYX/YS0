@@ -30,7 +30,7 @@
     permanent: true
     state: enabled
 
-- name: Reload firewalld
+- name: Reload firewalld for TFTP
   ansible.builtin.service:
     name: firewalld
     state: reloaded
@@ -52,7 +52,7 @@
     permanent: true
     state: enabled
 
-- name: Reload firewalld
+- name: Reload firewalld for DHCP
   ansible.builtin.service:
     name: firewalld
     state: reloaded
@@ -64,7 +64,7 @@
     enabled: true
 
 # Tasks for configuring TFTP boot files
-- name: Create kickstart directory
+- name: Create RPM download directory
   ansible.builtin.file:
     path: /tmp/rpm
     state: directory
@@ -163,8 +163,3 @@
   ansible.builtin.template:
     src: templates/ks.cfg.j2
     dest: /var/www/html/ks/ks.cfg
-
-- name: Reload firewalld
-  ansible.builtin.service:
-    name: firewalld
-    state: reloaded

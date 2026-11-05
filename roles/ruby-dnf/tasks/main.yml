@@ -1,5 +1,5 @@
 ---
-# tasks file for roles/ruby
+# tasks file for roles/ruby-dnf
 - name: Install packages for Ruby build and native gems
   ansible.builtin.dnf:
     name:
@@ -58,7 +58,7 @@
   community.general.gem:
     name: "{{ item }}"
     user_install: false
-  with_items:
+  loop:
     - bundler
     - minitest
     - rake

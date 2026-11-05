@@ -1,5 +1,5 @@
 ---
-# tasks file for roles/kvm-vagrant
+# tasks file for roles/kvm
 - name: Install yum-utils
   ansible.builtin.dnf:
     name: yum-utils
@@ -16,16 +16,14 @@
 
 - name: Install tools for kvm + vagrant
   ansible.builtin.dnf:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
+    name:
       - libvirt
       - libvirt-devel
       - qemu-kvm
       - vagrant
       - virt-install
       - virt-manager
+    state: present
 
 - name: Start libvirtd
   ansible.builtin.systemd_service:

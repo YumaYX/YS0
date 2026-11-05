@@ -22,7 +22,7 @@
     #- shellcheck
     #- homebrew
     #- rust
-    - rust-dnf
+    #- rust-dnf
     #- ruby-dnf
     - ruby
     - ys1
