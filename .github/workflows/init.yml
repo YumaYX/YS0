@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Verify environment
-        run: cat /etc/redhat-release
+        run: dnf -y update
 
       - name: Install prerequisites
         run: dnf -y install curl sudo
