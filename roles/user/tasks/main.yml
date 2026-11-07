@@ -1,12 +1,11 @@
 ---
-# tasks file for roles/user
-- name: Create user
+- name: Ensure the primary user exists
   ansible.builtin.user:
     name: "{{ prime_user }}"
-    password: "$6$CVPjfYCY$jGK9N2lKbkY3YH6yLZj.nyuKGhUGk3CxAvSeHn8KsToaHHbJafQ2NA/zV90H7Ij9YWb8xoBBbXT2z35N4RAjO1"
+    password: "{{ prime_user_password }}"
     shell: /bin/bash
 
-- name: Create remote_tmp for {{ prime_user }}
+- name: Create the Ansible temporary directory
   ansible.builtin.file:
     path: /home/{{ prime_user }}/.ansible/tmp
     state: directory
@@ -14,7 +13,7 @@
     group: "{{ prime_user }}"
     mode: "0700"
 
-- name: Sudo
+- name: Configure sudo access
   ansible.builtin.template:
     src: templates/sudo.j2
     dest: /etc/sudoers.d/{{ prime_user }}
@@ -23,7 +22,7 @@
     mode: "0440"
     validate: visudo -cf %s
 
-- name: Create a directory if it does not exist
+- name: Create the .ssh directory
   ansible.builtin.file:
     path: /home/{{ prime_user }}/.ssh
     state: directory
@@ -31,7 +30,7 @@
     group: "{{ prime_user }}"
     mode: "0700"
 
-- name: Generate ED25519 SSH key
+- name: Generate an ED25519 SSH key
   community.crypto.openssh_keypair:
     path: /home/{{ prime_user }}/.ssh/id_ed25519
     type: ed25519
@@ -43,45 +42,47 @@
   become_user: "{{ prime_user }}"
   register: user_ssh_key
 
-- name: Change Keys Owner
+- name: Set SSH key permissions
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     owner: "{{ prime_user }}"
     group: "{{ prime_user }}"
-    mode: "0600"
+    mode: "{{ item.mode }}"
   loop:
-    - /home/{{ prime_user }}/.ssh/id_ed25519
-    - /home/{{ prime_user }}/.ssh/id_ed25519.pub
+    - path: /home/{{ prime_user }}/.ssh/id_ed25519
+      mode: "0600"
+    - path: /home/{{ prime_user }}/.ssh/id_ed25519.pub
+      mode: "0644"
 
-- name: Add key only if not present
+- name: Authorize the generated public key
   ansible.posix.authorized_key:
     user: "{{ prime_user }}"
     key: "{{ user_ssh_key.public_key }}"
     state: present
     manage_dir: true
 
-- name: Git clone # noqa latest[git]
+- name: Clone the dotfiles repository # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/YumaYX/dotfiles.git
     dest: /work/lib/dotfiles
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Run 'install' target as {{ prime_user }}
+- name: Install dotfiles
   community.general.make:
     chdir: /work/lib/dotfiles
     target: install
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Git clone # noqa latest[git]
+- name: Clone the YS10 repository # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/YumaYX/YS10.git
     dest: /work/lib/YS10
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Run 'install' target as root
+- name: Install YS10
   community.general.make:
     chdir: /work/lib/YS10
     target: install

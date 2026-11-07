@@ -1,6 +1,5 @@
 ---
-# tasks file for roles/more
-- name: Add Google Chrome repository
+- name: Add the Google Chrome repository
   ansible.builtin.yum_repository:
     name: google-chrome
     description: Google Chrome
@@ -12,9 +11,4 @@
 - name: Install Google Chrome
   ansible.builtin.dnf:
     name: google-chrome-stable
-    state: present
-
-- name: Install Server with GUI
-  ansible.builtin.dnf:
-    name: "@Server with GUI"
     state: present

@@ -1,22 +1,33 @@
 export UV_PYTHON_INSTALL_DIR := /tmp/uv/python
-UV := ~/.local/bin/uv
+
+UV := $(HOME)/.local/bin/uv
 ENV_VARS := sudo -E LANG=C
 ANSIBLE_CMD := ansible-playbook -i localhost, -c local
 
-.PHONY: default all install local test pxe vagrant clean
+.DEFAULT_GOAL := help
+.PHONY: help all install local test pxe vagrant clean
 
-default:
-	@cat Makefile | grep ^[a-z] | sort | sed 's/^/make /g;s/:.*//g'
+help:
+	@echo "YS0 - development machine provisioning"
+	@echo ""
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "  install   Install uv and the Ansible dependencies"
+	@echo "  local     Configure this machine (ans_init.yml)"
+	@echo "  test      Run the Serverspec tests (ans_serverspec.yml)"
+	@echo "  pxe       Build the PXE boot server (ans_pxe.yml)"
+	@echo "  all       Same as 'make local'"
+	@echo "  vagrant   Test the whole setup inside a Vagrant VM"
+	@echo "  clean     Remove the VM, virtualenv, and Vagrant state"
 
-
-all: install local
+all: local
 
 install:
 	@command -v $(UV) >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
 	@echo "uv is installed: $$($(UV) --version)"
 	$(UV) sync
 
-# Main Functions
+# Main targets
 
 local: install
 	$(ENV_VARS) $(UV) run $(ANSIBLE_CMD) ans_init.yml
@@ -37,4 +48,4 @@ vagrant: clean
 clean:
 	@sudo -v
 	-vagrant destroy -f
-	sudo rm -rf .venv uv.lock .vagrant
+	sudo rm -rf .venv .vagrant

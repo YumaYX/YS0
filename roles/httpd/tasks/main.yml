@@ -1,19 +1,28 @@
 ---
-# Tasks file for managing HTTPD
+- name: Install firewalld
+  ansible.builtin.dnf:
+    name: firewalld
+    state: present
 
-- name: Configure firewalld for HTTP
+- name: Enable and start firewalld
+  ansible.builtin.systemd_service:
+    name: firewalld
+    enabled: true
+    state: started
+
+- name: Allow HTTP through the firewall
   ansible.posix.firewalld:
     service: http
     permanent: true
     state: enabled
     immediate: true
 
-- name: Install HTTPD package
+- name: Install httpd
   ansible.builtin.dnf:
     name: httpd
     state: present
 
-- name: Enable and start HTTPD service
+- name: Enable and start httpd
   ansible.builtin.systemd_service:
     name: httpd
     state: started

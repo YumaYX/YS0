@@ -1,15 +1,13 @@
 ---
-# Tasks file for the workspace role
-- name: Create user
+- name: Ensure the primary user exists
   ansible.builtin.user:
     name: "{{ prime_user }}"
     shell: /bin/bash
 
-- name: Ensure necessary directories exist
+- name: Create workspace directories
   ansible.builtin.file:
     path: /work/{{ item }}
     state: directory
-    recurse: false
     owner: "{{ prime_user }}"
     group: "{{ prime_user }}"
     mode: "0755"

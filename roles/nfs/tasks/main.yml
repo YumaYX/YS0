@@ -1,11 +1,21 @@
 ---
-# tasks file for roles/nfs
-- name: Install nfs util
+- name: Install firewalld
+  ansible.builtin.dnf:
+    name: firewalld
+    state: present
+
+- name: Enable and start firewalld
+  ansible.builtin.systemd_service:
+    name: firewalld
+    enabled: true
+    state: started
+
+- name: Install NFS utilities
   ansible.builtin.dnf:
     name: nfs-utils
     state: present
 
-- name: Add setting to /etc/exports
+- name: Configure /etc/exports
   ansible.builtin.blockinfile:
     path: /etc/exports
     marker: "# Ansible {mark}"
@@ -15,7 +25,7 @@
       /nfs *(rw,all_squash,async)
   notify: Restart NFS server
 
-- name: Create directory if it doesn't exist
+- name: Create the NFS directory
   ansible.builtin.file:
     path: /nfs
     state: directory
@@ -23,7 +33,7 @@
     group: nobody
     mode: "0777"
 
-- name: Enable rpcbind and nfs-server services
+- name: Enable and start rpcbind and nfs-server
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
@@ -32,7 +42,7 @@
     - rpcbind
     - nfs-server
 
-- name: Open NFS ports in Firewalld
+- name: Allow NFS through the firewall
   ansible.posix.firewalld:
     service: "{{ item }}"
     state: enabled

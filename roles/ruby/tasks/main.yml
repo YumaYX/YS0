@@ -1,16 +1,15 @@
 ---
-# tasks file for roles/ruby
 - name: Install dnf plugins
   ansible.builtin.dnf:
     name: dnf-plugins-core
     state: present
 
-- name: Ensure CRB repository is enabled
+- name: Enable the CRB repository
   community.general.dnf_config_manager:
     name: crb
     state: enabled
 
-- name: Install packages for Ruby
+- name: Install Ruby build dependencies
   ansible.builtin.dnf:
     name:
       - bzip2
@@ -26,14 +25,14 @@
       - libffi-devel
     state: present
 
-- name: Git clone rbenv # noqa latest[git]
+- name: Clone rbenv # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/rbenv/rbenv.git
     dest: /home/{{ prime_user }}/.rbenv
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Git clone ruby-build # noqa latest[git]
+- name: Clone ruby-build # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/rbenv/ruby-build.git
     dest: /home/{{ prime_user }}/.rbenv/plugins/ruby-build
@@ -48,7 +47,7 @@
   changed_when: false
   failed_when: false
 
-- name: Install Ruby
+- name: Install Ruby {{ ruby_version }}
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv install {{ ruby_version }}
   environment:
     CONFIGURE_OPTS: '--disable-install-doc'
@@ -57,7 +56,7 @@
   changed_when: true
   when: ruby_version not in ruby_rbenv_versions.stdout_lines
 
-- name: Check global Ruby version
+- name: Check the global Ruby version
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv global
   become: true
   become_user: "{{ prime_user }}"
@@ -65,14 +64,14 @@
   changed_when: false
   failed_when: false
 
-- name: Set global Ruby version
+- name: Set the global Ruby version to {{ ruby_version }}
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv global {{ ruby_version }}
   become: true
   become_user: "{{ prime_user }}"
   changed_when: true
   when: ruby_rbenv_global.stdout | trim != ruby_version
 
-- name: Install bundler gem
+- name: Install bundler
   community.general.gem:
     name: bundler
     executable: /home/{{ prime_user }}/.rbenv/shims/gem
@@ -80,7 +79,7 @@
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Create update-rubygems script
+- name: Create the update-rubygems script
   ansible.builtin.copy:
     dest: /usr/local/bin/update-rubygems
     content: |
@@ -94,7 +93,7 @@
     group: "{{ prime_user }}"
     mode: "0755"
 
-- name: Gem update - cron
+- name: Schedule weekly gem updates
   ansible.builtin.cron:
     name: gem-update-cron
     minute: "0"

@@ -7,14 +7,22 @@
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Bundle install
-  community.general.bundler:
+- name: Configure Bundler to use the system gem path
+  ansible.builtin.command:
+    cmd: /home/{{ prime_user }}/.rbenv/shims/bundle config set --local path.system true
     chdir: /work/downloads/YS1
-    executable: /home/{{ prime_user }}/.rbenv/shims/bundle
-    state: present
-    user_install: false
   become: true
   become_user: "{{ prime_user }}"
+  changed_when: false
+
+- name: Install Ruby dependencies with Bundler
+  ansible.builtin.command:
+    cmd: /home/{{ prime_user }}/.rbenv/shims/bundle install
+    chdir: /work/downloads/YS1
+  become: true
+  become_user: "{{ prime_user }}"
+  register: ys1_bundle_install
+  changed_when: "'Installing' in ys1_bundle_install.stdout"
 
 - name: Check if ys1 gem is installed
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/shims/gem list -i ys1

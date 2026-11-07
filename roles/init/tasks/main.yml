@@ -1,6 +1,5 @@
 ---
-# tasks file for roles/init
-- name: Set hostname
+- name: Set the hostname
   ansible.builtin.hostname:
     name: y.localdomain
 
@@ -17,14 +16,14 @@
     - option: max_parallel_downloads
       value: '10'
 
-- name: Schedule dnf update
+- name: Schedule daily dnf updates
   ansible.builtin.cron:
     name: dnf-update-cron
     minute: "0"
     hour: "4"
     job: dnf -y update
 
-- name: Install tools
+- name: Install base packages
   ansible.builtin.dnf:
     name:
       - firewalld
@@ -35,7 +34,7 @@
       - "@Development Tools"
     state: present
 
-- name: Start firewalld
+- name: Enable and start firewalld
   ansible.builtin.systemd_service:
     name: firewalld
     enabled: true
