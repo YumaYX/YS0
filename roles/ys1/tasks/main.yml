@@ -40,3 +40,24 @@
   become_user: "{{ prime_user }}"
   changed_when: true
   when: ys1_gem.stdout | trim != 'true'
+
+- name: Install Ruby from dnf
+  ansible.builtin.dnf:
+    name:
+      - ruby
+      - ruby-devel
+    state: present
+
+- name: Build the ys1 gem
+  ansible.builtin.command:
+    cmd: /usr/bin/gem build -o /tmp/ys1.gem ys1.gemspec
+    chdir: /work/downloads/YS1
+  become: true
+  become_user: "{{ prime_user }}"
+  changed_when: true
+
+- name: Install the ys1 gem as root
+  ansible.builtin.command:
+    cmd: /usr/bin/gem install --local /tmp/ys1.gem
+  register: ys1_system_install
+  changed_when: "'Successfully installed' in ys1_system_install.stdout"
