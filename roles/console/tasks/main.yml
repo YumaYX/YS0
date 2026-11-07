@@ -7,9 +7,5 @@
     line: 'FONT="latarcyrheb-sun32"'
     state: present
     create: true
-
-- name: Restart systemd-vconsole-setup
-  ansible.builtin.systemd_service:
-    name: systemd-vconsole-setup
-    state: restarted
-
+    mode: "0644"
+  notify: Restart systemd-vconsole-setup

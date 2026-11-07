@@ -1,23 +1,34 @@
 ---
 # tasks file for roles/ys1
-- name: Git clone YS1
+- name: Git clone YS1 # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/YumaYX/YS1.git
     dest: /work/downloads/YS1
-    force: true
   become: true
   become_user: "{{ prime_user }}"
 
-- name: bundle install
-  ansible.builtin.command: ~/.rbenv/shims/bundle install
+- name: Bundle install
+  community.general.bundler:
+    chdir: /work/downloads/YS1
+    executable: /home/{{ prime_user }}/.rbenv/shims/bundle
+    state: present
+    user_install: false
+  become: true
+  become_user: "{{ prime_user }}"
+
+- name: Check if ys1 gem is installed
+  ansible.builtin.command: /home/{{ prime_user }}/.rbenv/shims/gem list -i ys1
+  become: true
+  become_user: "{{ prime_user }}"
+  register: ys1_gem
+  changed_when: false
+  failed_when: false
+
+- name: Rake install local
+  ansible.builtin.command: /home/{{ prime_user }}/.rbenv/shims/bundle exec rake install:local
   args:
     chdir: /work/downloads/YS1
   become: true
   become_user: "{{ prime_user }}"
-
-- name: rake install local
-  ansible.builtin.command: ~/.rbenv/shims/bundle exec rake install:local
-  args:
-    chdir: /work/downloads/YS1
-  become: true
-  become_user: "{{ prime_user }}"
+  changed_when: true
+  when: ys1_gem.stdout | trim != 'true'

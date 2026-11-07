@@ -15,5 +15,6 @@
     state: present
 
 - name: Install Server with GUI
-  ansible.builtin.shell: |
-    dnf -y groupinstall "Server with GUI"
+  ansible.builtin.dnf:
+    name: "@Server with GUI"
+    state: present

@@ -6,20 +6,15 @@
     service: http
     permanent: true
     state: enabled
-
-- name: Reload firewalld
-  ansible.builtin.service:
-    name: firewalld
-    state: reloaded
+    immediate: true
 
 - name: Install HTTPD package
   ansible.builtin.dnf:
     name: httpd
     state: present
 
-- name: Restart HTTPD service
+- name: Enable and start HTTPD service
   ansible.builtin.systemd_service:
     name: httpd
-    state: restarted
+    state: started
     enabled: true
-    daemon_reload: true

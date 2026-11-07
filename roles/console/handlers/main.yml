@@ -1,0 +1,5 @@
+---
+- name: Restart systemd-vconsole-setup
+  ansible.builtin.systemd_service:
+    name: systemd-vconsole-setup
+    state: restarted

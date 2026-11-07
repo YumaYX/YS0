@@ -18,6 +18,10 @@
   ansible.builtin.template:
     src: templates/sudo.j2
     dest: /etc/sudoers.d/{{ prime_user }}
+    owner: root
+    group: root
+    mode: "0440"
+    validate: visudo -cf %s
 
 - name: Create a directory if it does not exist
   ansible.builtin.file:
@@ -27,19 +31,17 @@
     group: "{{ prime_user }}"
     mode: "0700"
 
-- name: Check if SSH key exists
-  ansible.builtin.stat:
-    path: /home/{{ prime_user }}/.ssh/id_ed25519
-  register: file_status
-
 - name: Generate ED25519 SSH key
   community.crypto.openssh_keypair:
     path: /home/{{ prime_user }}/.ssh/id_ed25519
     type: ed25519
     passphrase: ""
+    owner: "{{ prime_user }}"
+    group: "{{ prime_user }}"
+    mode: "0600"
   become: true
   become_user: "{{ prime_user }}"
-  when: not file_status.stat.exists
+  register: user_ssh_key
 
 - name: Change Keys Owner
   ansible.builtin.file:
@@ -51,17 +53,12 @@
     - /home/{{ prime_user }}/.ssh/id_ed25519
     - /home/{{ prime_user }}/.ssh/id_ed25519.pub
 
-- name: Read public key from remote
-  ansible.builtin.command: cat /home/{{ prime_user }}/.ssh/id_ed25519.pub
-  register: pubkey
-  changed_when: false
-
 - name: Add key only if not present
-  ansible.builtin.lineinfile:
-    path: /home/{{ prime_user }}/.ssh/authorized_keys
-    line: "{{ pubkey.stdout | trim }}"
-    create: true
-    mode: '0600'
+  ansible.posix.authorized_key:
+    user: "{{ prime_user }}"
+    key: "{{ user_ssh_key.public_key }}"
+    state: present
+    manage_dir: true
 
 - name: Git clone # noqa latest[git]
   ansible.builtin.git:
@@ -89,4 +86,3 @@
     chdir: /work/lib/YS10
     target: install
   become: true
-

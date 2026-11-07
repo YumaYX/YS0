@@ -4,19 +4,18 @@
   ansible.builtin.hostname:
     name: y.localdomain
 
-- name: Set fastestmirror
+- name: Configure dnf
   ansible.builtin.ini_file:
     path: /etc/dnf/dnf.conf
     section: main
-    option: fastestmirror
-    value: 'True'
-
-- name: Set max_parallel_downloads
-  ansible.builtin.ini_file:
-    path: /etc/dnf/dnf.conf
-    section: main
-    option: max_parallel_downloads
-    value: '10'
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: "0644"
+  loop:
+    - option: fastestmirror
+      value: 'True'
+    - option: max_parallel_downloads
+      value: '10'
 
 - name: Schedule dnf update
   ansible.builtin.cron:
@@ -33,11 +32,8 @@
       - vim
       - jq
       - cronie
+      - "@Development Tools"
     state: present
-
-- name: Install package group
-  ansible.builtin.shell: |
-    dnf -y groupinstall "Development Tools"
 
 - name: Start firewalld
   ansible.builtin.systemd_service:

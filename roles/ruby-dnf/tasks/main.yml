@@ -49,11 +49,6 @@
       - tar
     state: present
 
-- name: Update Gems system
-  ansible.builtin.command: bash -lc "gem update --system"
-  become: true
-  become_user: "{{ prime_user }}"
-
 - name: Install necessary gems
   community.general.gem:
     name: "{{ item }}"
@@ -69,4 +64,3 @@
     - sqlite3
   become: true
   become_user: "{{ prime_user }}"
-

@@ -1,14 +1,14 @@
 ---
 # tasks file for roles/ruby
-- name: Check if CRB repository is enabled
-  ansible.builtin.shell: dnf repolist --enabled | grep -qE '^crb\b'
-  register: crb_check
-  changed_when: false
-  failed_when: false
+- name: Install dnf plugins
+  ansible.builtin.dnf:
+    name: dnf-plugins-core
+    state: present
 
 - name: Ensure CRB repository is enabled
-  ansible.builtin.command: bash -lc "dnf config-manager --set-enabled crb"
-  when: crb_check.rc != 0
+  community.general.dnf_config_manager:
+    name: crb
+    state: enabled
 
 - name: Install packages for Ruby
   ansible.builtin.dnf:
@@ -26,14 +26,14 @@
       - libffi-devel
     state: present
 
-- name: Git clone rbenv
+- name: Git clone rbenv # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/rbenv/rbenv.git
     dest: /home/{{ prime_user }}/.rbenv
   become: true
   become_user: "{{ prime_user }}"
 
-- name: Git clone ruby-build
+- name: Git clone ruby-build # noqa latest[git]
   ansible.builtin.git:
     repo: https://github.com/rbenv/ruby-build.git
     dest: /home/{{ prime_user }}/.rbenv/plugins/ruby-build
@@ -44,21 +44,24 @@
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv versions --bare
   become: true
   become_user: "{{ prime_user }}"
-  register: rbenv_versions
+  register: ruby_rbenv_versions
   changed_when: false
   failed_when: false
 
 - name: Install Ruby
-  ansible.builtin.shell: /bin/bash -lc "CONFIGURE_OPTS='--disable-install-doc' /home/{{ prime_user }}/.rbenv/bin/rbenv install {{ ruby_version }}"
+  ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv install {{ ruby_version }}
+  environment:
+    CONFIGURE_OPTS: '--disable-install-doc'
   become: true
   become_user: "{{ prime_user }}"
-  when: ruby_version not in rbenv_versions.stdout_lines
+  changed_when: true
+  when: ruby_version not in ruby_rbenv_versions.stdout_lines
 
 - name: Check global Ruby version
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv global
   become: true
   become_user: "{{ prime_user }}"
-  register: rbenv_global
+  register: ruby_rbenv_global
   changed_when: false
   failed_when: false
 
@@ -66,15 +69,14 @@
   ansible.builtin.command: /home/{{ prime_user }}/.rbenv/bin/rbenv global {{ ruby_version }}
   become: true
   become_user: "{{ prime_user }}"
-  when: rbenv_global.stdout | trim != ruby_version
-
-- name: Update Gems system
-  ansible.builtin.command: bash -lc "gem update --system"
-  become: true
-  become_user: "{{ prime_user }}"
+  changed_when: true
+  when: ruby_rbenv_global.stdout | trim != ruby_version
 
 - name: Install bundler gem
-  ansible.builtin.command: "/home/{{ prime_user }}/.rbenv/shims/gem install bundler"
+  community.general.gem:
+    name: bundler
+    executable: /home/{{ prime_user }}/.rbenv/shims/gem
+    user_install: false
   become: true
   become_user: "{{ prime_user }}"
 

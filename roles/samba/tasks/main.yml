@@ -27,13 +27,6 @@
       - cifs-utils
     state: present
 
-- name: Backup original smb.conf
-  ansible.builtin.copy:
-    src: /etc/samba/smb.conf
-    dest: /etc/samba/smb.conf.bak
-    remote_src: true
-    backup: true
-
 - name: Write custom smb.conf
   ansible.builtin.copy:
     dest: /etc/samba/smb.conf
@@ -60,20 +53,26 @@
     owner: root
     group: root
     mode: "0644"
+    backup: true
+  notify: Restart Samba services
 
-- name: Ensure {{ prime_user }} user exists on system
+- name: Ensure account exists for {{ prime_user }}
   ansible.builtin.user:
     name: "{{ prime_user }}"
     state: present
 
 - name: Fetch Samba users
   ansible.builtin.command: /usr/bin/pdbedit -L
-  register: pdb_users
+  register: samba_pdb_users
   changed_when: false
 
 - name: Set Samba password for {{ prime_user }}
-  ansible.builtin.shell: (echo '{{ prime_user }}'; echo '{{ prime_user }}') | /usr/bin/smbpasswd -s -a "{{ prime_user}}"
-  when: pdb_users.stdout.find(prime_user) == -1
+  ansible.builtin.command: /usr/bin/smbpasswd -s -a "{{ prime_user }}"
+  args:
+    stdin: "{{ prime_user }}\n{{ prime_user }}"
+  when: samba_pdb_users.stdout.find(prime_user) == -1
+  changed_when: true
+  no_log: true
 
 - name: Install required SELinux tools
   ansible.builtin.dnf:
@@ -95,15 +94,13 @@
     state: present
   vars:
     ansible_python_interpreter: /usr/bin/python3
+  notify: Apply SELinux context
 
-- name: Apply SELinux context to share directory
-  ansible.builtin.command: restorecon -Rv /samba
-
-- name: Enable and restart smb and nmb services
+- name: Enable and start smb and nmb services
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
-    state: restarted
+    state: started
   loop:
     - smb
     - nmb

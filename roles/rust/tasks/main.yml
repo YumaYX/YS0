@@ -1,14 +1,16 @@
 ---
 # tasks file for roles/rust
-- name: Install gcc
+- name: Install GCC
   ansible.builtin.dnf:
-    name: "{{ packages }}"
+    name: gcc
     state: present
-  vars:
-    packages:
-      - gcc
 
 - name: Install Rust
-  ansible.builtin.shell: /bin/bash -lc "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --no-modify-path"
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+  args:
+    executable: /bin/bash
+    creates: /home/{{ prime_user }}/.cargo/bin/rustc
   become: true
   become_user: "{{ prime_user }}"
